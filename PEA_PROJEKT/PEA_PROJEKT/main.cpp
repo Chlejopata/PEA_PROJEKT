@@ -4,6 +4,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+	for(int i = 0; i< 10; ++i) // Dodana linia
 	cout << "Test" << endl;
 	return 0;
 }
