@@ -65,6 +65,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MatrixGraph.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Edge.h" />
+    <ClInclude Include="MatrixGraph.h" />
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
