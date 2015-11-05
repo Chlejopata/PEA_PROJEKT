@@ -20,9 +20,9 @@ public:
 	void generateGraph(uint vertexNumber, bool symmetrical = true);
 	void output(bool noColor = false);
 
-	void bruteForce(bool printProgress);
+	void bruteForce(bool printProgress, bool print);
 	uint greedyAlg(vector<uint> &bestRoute);
-	void simulatedAnnealing();
+	void simulatedAnnealing(uint temperature);
 
 	int getValue(uint row, uint col);
 
@@ -57,6 +57,7 @@ private:
 	uint calculateCost(vector<uint> path);
 
 	static bool nextPermutation(uint *array, uint length);
+	static double acceptanceProbability(uint energy, uint newEnergy, uint temperature);
 };
 
 #endif /* HEADERS_MATRIXGRAPH_H_ */

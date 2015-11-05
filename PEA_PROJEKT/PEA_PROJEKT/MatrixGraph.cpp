@@ -141,7 +141,7 @@ void MatrixGraph::output(bool noColor)
 	}
 }
 
-void MatrixGraph::bruteForce(bool printProgress)
+void MatrixGraph::bruteForce(bool printProgress, bool print)
 {
 	uint townNumber = vertexNumber;
 	if (!townNumber)
@@ -239,7 +239,7 @@ void MatrixGraph::bruteForce(bool printProgress)
 
 	double duration = (clock() - overallTime) / (double)CLOCKS_PER_SEC;
 
-	if (printProgress)
+	if (print)
 	{
 		cout << "\nDroga:\n";
 		for (uint i = 0; i < townNumber; ++i)
@@ -316,18 +316,29 @@ uint MatrixGraph::greedyAlg(vector<uint> &bestRoute)
 	return bestWeight;
 }
 
-void MatrixGraph::simulatedAnnealing()
+void MatrixGraph::simulatedAnnealing(uint temperature)
 {
-	exponential_distribution<double> expRnd(1.0);
 	vector<uint> route;
 	uint prevCost = greedyAlg(route);
-	
-	for (uint i = 1; i < route.size(); i++)
+	route.pop_back();
+
+	default_random_engine gen(uint(time(nullptr)));
+	uniform_real_distribution<double> doubleRnd(0.0, 1.0);
+
+	clock_t overallTime = clock();
+	uint i = 0;
+	for (; temperature; --temperature, ++i)
 	{
+		i %= route.size();
+		uint firstIndex = i;
+		uint secondIndex = rand() % (route.size() - 1);
+		if (secondIndex >= firstIndex)
+			++secondIndex;
+
 		vector<uint> tmpVector(route);
-		uint tmp = tmpVector[i - 1];
-		tmpVector[i - 1] = tmpVector[i];
-		tmpVector[i] = tmp;
+		uint tmp = tmpVector[firstIndex];
+		tmpVector[firstIndex] = tmpVector[secondIndex];
+		tmpVector[secondIndex] = tmp;
 
 		uint tmpCost = calculateCost(tmpVector);
 		if (tmpCost < prevCost)
@@ -337,10 +348,25 @@ void MatrixGraph::simulatedAnnealing()
 		}
 		else
 		{
-			//TODO: akceptować z prawdopodobieństwem rozkładu Boltzmana
-			//if ()
+			if (acceptanceProbability(prevCost, tmpCost, temperature) > doubleRnd(gen))
+			{
+				route = tmpVector;
+				prevCost = tmpCost;
+			}
 		}
 	}
+
+	double duration = (clock() - overallTime) / (double)CLOCKS_PER_SEC;
+
+	cout << "\nDroga:\n";
+	for (uint i = 0; i < route.size(); ++i)
+	{
+		if (i < route.size())
+			cout << route[i] << " -> ";
+	}
+	cout << route[0] << endl;
+	cout << "Koszt drogi: " << prevCost << endl;
+	cout << "Calkowity czas trwania: " << duration << " sekund\n";
 }
 
 int MatrixGraph::getValue(uint row, uint col)
@@ -638,3 +664,12 @@ bool MatrixGraph::nextPermutation(uint *array, uint length)
 	return true;
 }
 
+double MatrixGraph::acceptanceProbability(uint energy, uint newEnergy, uint temperature)
+{
+	// If the new solution is better, accept it
+	if (newEnergy < energy) {
+		return 1.0;
+	}
+	// If the new solution is worse, calculate an acceptance probability
+	return exp(double(energy - newEnergy) / double(temperature));
+}
