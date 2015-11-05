@@ -22,6 +22,7 @@ public:
 
 	void bruteForce(bool printProgress);
 	uint greedyAlg(vector<uint> &bestRoute);
+	void simulatedAnnealing();
 
 	int getValue(uint row, uint col);
 
@@ -53,6 +54,7 @@ private:
 	void setValue(uint row, uint col, int value = -1);
 
 	long noRepeatDraw(bool* drawn, uint length);
+	uint calculateCost(vector<uint> path);
 
 	static bool nextPermutation(uint *array, uint length);
 };

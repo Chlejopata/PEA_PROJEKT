@@ -316,6 +316,33 @@ uint MatrixGraph::greedyAlg(vector<uint> &bestRoute)
 	return bestWeight;
 }
 
+void MatrixGraph::simulatedAnnealing()
+{
+	exponential_distribution<double> expRnd(1.0);
+	vector<uint> route;
+	uint prevCost = greedyAlg(route);
+	
+	for (uint i = 1; i < route.size(); i++)
+	{
+		vector<uint> tmpVector(route);
+		uint tmp = tmpVector[i - 1];
+		tmpVector[i - 1] = tmpVector[i];
+		tmpVector[i] = tmp;
+
+		uint tmpCost = calculateCost(tmpVector);
+		if (tmpCost < prevCost)
+		{
+			route = tmpVector;
+			prevCost = tmpCost;
+		}
+		else
+		{
+			//TODO: akceptować z prawdopodobieństwem rozkładu Boltzmana
+			//if ()
+		}
+	}
+}
+
 int MatrixGraph::getValue(uint row, uint col)
 {
 	return matrix[row][col];
@@ -567,6 +594,16 @@ long MatrixGraph::noRepeatDraw(bool* drawn, uint length)
 
 	drawn[--retVal] = true;
 	return retVal;
+}
+
+uint MatrixGraph::calculateCost(vector<uint> path)
+{
+	uint cost = 0;
+	for (uint i = 1; i < path.size(); i++)
+	{
+		cost += getValue(path[i - 1], path[i]);
+	}
+	return cost;
 }
 
 bool MatrixGraph::nextPermutation(uint *array, uint length)
