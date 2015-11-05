@@ -318,9 +318,11 @@ uint MatrixGraph::greedyAlg(vector<uint> &bestRoute)
 
 void MatrixGraph::simulatedAnnealing(uint temperature)
 {
-	vector<uint> route;
-	uint prevCost = greedyAlg(route);
+	vector<uint> route, bestRoute;
+	uint prevCost = greedyAlg(route), bestCost;
 	route.pop_back();
+	bestRoute = route;
+	bestCost = prevCost;
 
 	default_random_engine gen(uint(time(nullptr)));
 	uniform_real_distribution<double> doubleRnd(0.0, 1.0);
@@ -348,24 +350,31 @@ void MatrixGraph::simulatedAnnealing(uint temperature)
 		}
 		else
 		{
-			if (acceptanceProbability(prevCost, tmpCost, temperature) > doubleRnd(gen))
+			if (acceptanceProbability(prevCost, tmpCost, temperature) >= doubleRnd(gen))
 			{
 				route = tmpVector;
 				prevCost = tmpCost;
 			}
+		}
+
+		// Śledzenie najlepszego rozwiązania
+		if (prevCost < bestCost)
+		{
+			bestRoute = route;
+			bestCost = prevCost;
 		}
 	}
 
 	double duration = (clock() - overallTime) / (double)CLOCKS_PER_SEC;
 
 	cout << "\nDroga:\n";
-	for (uint i = 0; i < route.size(); ++i)
+	for (uint i = 0; i < bestRoute.size(); ++i)
 	{
-		if (i < route.size())
-			cout << route[i] << " -> ";
+		if (i < bestRoute.size())
+			cout << bestRoute[i] << " -> ";
 	}
-	cout << route[0] << endl;
-	cout << "Koszt drogi: " << prevCost << endl;
+	cout << bestRoute[0] << endl;
+	cout << "Koszt drogi: " << bestCost << endl;
 	cout << "Calkowity czas trwania: " << duration << " sekund\n";
 }
 
@@ -628,6 +637,11 @@ uint MatrixGraph::calculateCost(vector<uint> path)
 	for (uint i = 1; i < path.size(); i++)
 	{
 		cost += getValue(path[i - 1], path[i]);
+	}
+
+	if (path.size() > 1)
+	{
+		cost += getValue(path.back(), path.front());
 	}
 	return cost;
 }
