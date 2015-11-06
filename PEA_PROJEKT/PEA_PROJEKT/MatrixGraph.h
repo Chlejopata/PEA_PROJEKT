@@ -10,12 +10,12 @@ class MatrixGraph
 public:
 	MatrixGraph(uint vertexNumber = 0);
 	MatrixGraph(const MatrixGraph &mg);
-	MatrixGraph(ifstream &input);
+	MatrixGraph(char* path);
 	virtual ~MatrixGraph();
 
 	MatrixGraph & operator =(const MatrixGraph & mg);
 	void clone(const MatrixGraph &mg);
-	void readFile(ifstream &input);
+	void readXml(char* path);
 	void writeFile(ofstream &output);
 	void generateGraph(uint vertexNumber, bool symmetrical = true);
 	void output(bool noColor = false);

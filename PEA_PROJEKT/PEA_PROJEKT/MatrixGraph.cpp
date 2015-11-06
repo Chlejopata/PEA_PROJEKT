@@ -28,12 +28,12 @@ MatrixGraph::MatrixGraph(const MatrixGraph &mg)
 	this->clone(mg);
 }
 
-MatrixGraph::MatrixGraph(ifstream &input)
+MatrixGraph::MatrixGraph(char* path)
 {
 	this->vertexNumber = 0;
 	this->matrix = nullptr;
 
-	readFile(input);
+	readXml(path);
 }
 
 MatrixGraph::~MatrixGraph()
@@ -58,24 +58,39 @@ void MatrixGraph::clone(const MatrixGraph &mg)
 	}
 }
 
-void MatrixGraph::readFile(ifstream &input)
+void MatrixGraph::readXml(char* path)
 {
-	uint vNum = 0;
-	if (!input.is_open())
-		input.open("input.txt", ios_base::in);
+	file<> xmlFile(path);
+	xml_document<> doc;
+	doc.parse<0>(xmlFile.data());
 
-	input >> vNum;	// liczba wierzchołków
-
-	if (reserve(vNum))
+	xml_node<>* node = doc.first_node("travellingSalesmanProblemInstance");
+	if (node)
 	{
-		for (uint i = 0; i < vertexNumber; ++i)
+		node = node->first_node("graph");
+		if (node)
 		{
-			for (uint j = 0; j < vertexNumber; j++)
+			uint vNum = count_children(node);
+			reserve(vNum);
+
+			for (uint i = 0; i < vertexNumber; i++)
 			{
-				input >> matrix[i][j];
+				matrix[i][i] = -1;
+			}
+
+			node = node->first_node("vertex");
+			for (uint vertex = 0; node != nullptr; node = node->next_sibling("vertex"), ++vertex)
+			{
+				xml_node<>* edge = node->first_node("edge");
+				for (; edge != nullptr; edge = edge->next_sibling("edge"))
+				{
+					matrix[vertex][atoi(edge->value())] = int(atof(edge->first_attribute("cost")->value()));
+				}
 			}
 		}
 	}
+
+	output();
 }
 
 void MatrixGraph::writeFile(ofstream &output)
@@ -199,13 +214,13 @@ void MatrixGraph::bruteForce(bool printProgress, bool print)
 			perms += onePerm;
 			if (currStep == 1000)
 			{
-				onePerm /= 1000.0;
+				perms /= 1000.0;
 				double factorial = 2;
 				for (uint i = 3; i < townNumber; ++i)
 					factorial *= i;
-				onePerm *= endStep;
+				perms *= endStep;
 				if (printProgress)
-					cout << "Przewidywany czas trwania: " << onePerm << " sekund\n";
+					cout << "Przewidywany czas trwania: " << perms << " sekund\n";
 			}
 		}
 
@@ -318,21 +333,25 @@ uint MatrixGraph::greedyAlg(vector<uint> &bestRoute)
 
 void MatrixGraph::simulatedAnnealing(uint temperature)
 {
+	
+	clock_t overallTime = clock();
 	vector<uint> route, bestRoute;
 	uint prevCost = greedyAlg(route), bestCost;
 	route.pop_back();
 	bestRoute = route;
 	bestCost = prevCost;
 
+	if (!temperature)
+		temperature = vertexNumber << 4;
+
 	default_random_engine gen(uint(time(nullptr)));
 	uniform_real_distribution<double> doubleRnd(0.0, 1.0);
 
-	clock_t overallTime = clock();
 	uint i = 0;
 	for (; temperature; --temperature, ++i)
 	{
 		i %= route.size();
-		uint firstIndex = i;
+		uint firstIndex = rand() % (route.size());
 		uint secondIndex = rand() % (route.size() - 1);
 		if (secondIndex >= firstIndex)
 			++secondIndex;
