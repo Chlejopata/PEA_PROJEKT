@@ -385,32 +385,33 @@ void MatrixGraph::simulatedAnnealing(uint temperature)
 	}
 
 	double duration = (clock() - overallTime) / (double)CLOCKS_PER_SEC;
-	char routeView = 't';
-	if(bestRoute.size() > 100)
-	{
-		cout << "Droga jest zbyt dluga. Czy pomimo tego chcesz ja wyświetlic?[t]/[n]\n";
-		cin >> routeView;
-		cin.ignore();
-	}
-	switch(routeView)
-	{
-		case 't':
-		case 'T':
-		{
-			cout << "\nDroga:\n";
-			for (uint i = 0; i < bestRoute.size(); ++i)
-			{
-				cout << bestRoute[i] << " -> ";
-			}
-			cout << bestRoute[0] << endl;
-		}break;
-		default:
-		break;
+	// char routeView = 't';
+	// if(bestRoute.size() > 100)
+	// {
+	// 	cout << "Droga jest zbyt dluga. Czy pomimo tego chcesz ja wyświetlic?[t]/[n]\n";
+	// 	cin >> routeView;
+	// 	cin.ignore();
+	// }
+	// switch(routeView)
+	// {
+	// 	case 't':
+	// 	case 'T':
+	// 	{
+	// 		cout << "\nDroga:\n";
+	// 		for (uint i = 0; i < bestRoute.size(); ++i)
+	// 		{
+	// 			cout << bestRoute[i] << " -> ";
+	// 		}
+	// 		cout << bestRoute[0] << endl;
+	// 	}break;
+	// 	default:
+	// 	break;
 
-	}
+	// }
 		
-	cout << "Koszt drogi: " << bestCost << endl;
-	cout << "Calkowity czas trwania: " << duration << " sekund\n";
+	// cout << "Koszt drogi: " << bestCost << endl;
+	// cout << "Calkowity czas trwania: " << duration << " sekund\n";
+	cout << bestCost << "; "<<duration<<endl;
 }
 
 int MatrixGraph::getValue(uint row, uint col)

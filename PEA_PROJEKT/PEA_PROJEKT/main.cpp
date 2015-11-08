@@ -17,7 +17,14 @@ int main(int argc, char** argv)
 
 	if(argc > 1) //testowanie
 	{
-
+		srand(time(NULL));
+		cout << argv[1] << endl;
+		int n = atoi(argv[2]);
+		for(int i = 0; i < n; ++i)
+		{
+			MatrixGraph g(argv[1]);
+			g.simulatedAnnealing();
+		}
 	}
 	else //menu
 	{
