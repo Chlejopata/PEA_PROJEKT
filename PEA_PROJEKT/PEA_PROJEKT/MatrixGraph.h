@@ -15,14 +15,14 @@ public:
 
 	MatrixGraph & operator =(const MatrixGraph & mg);
 	void clone(const MatrixGraph &mg);
-	void readXml(char* path);
+	void readXml(const char* path);
 	void writeFile(ofstream &output);
 	void generateGraph(uint vertexNumber, bool symmetrical = true);
 	void output(bool noColor = false);
 
 	void bruteForce(bool printProgress, bool print);
 	uint greedyAlg(vector<uint> &bestRoute);
-	void simulatedAnnealing(uint temperature);
+	void simulatedAnnealing(uint temperature = 0);
 
 	int getValue(uint row, uint col);
 

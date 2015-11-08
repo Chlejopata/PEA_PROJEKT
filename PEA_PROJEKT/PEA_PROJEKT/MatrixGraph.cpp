@@ -58,7 +58,7 @@ void MatrixGraph::clone(const MatrixGraph &mg)
 	}
 }
 
-void MatrixGraph::readXml(char* path)
+void MatrixGraph::readXml(const char* path)
 {
 	file<> xmlFile(path);
 	xml_document<> doc;
@@ -89,8 +89,6 @@ void MatrixGraph::readXml(char* path)
 			}
 		}
 	}
-
-	output();
 }
 
 void MatrixGraph::writeFile(ofstream &output)
@@ -142,6 +140,9 @@ void MatrixGraph::output(bool noColor)
 	const uint columnMaxValue = getColumnMaxValue();
 	const uint columnValueWidth = (uint)(ceil(log10(columnMaxValue)) + 1);
 	const uint vertIndexWidth = (uint)(ceil(log10(vertexNumber - 1)));
+
+	if(! vertexNumber)
+		cout << "Brak grafu do wyświetlenia!\n\n";
 
 	for (uint row = 0; row < vertexNumber; row++)
 	{
@@ -333,7 +334,6 @@ uint MatrixGraph::greedyAlg(vector<uint> &bestRoute)
 
 void MatrixGraph::simulatedAnnealing(uint temperature)
 {
-	
 	clock_t overallTime = clock();
 	vector<uint> route, bestRoute;
 	uint prevCost = greedyAlg(route), bestCost;
@@ -342,7 +342,7 @@ void MatrixGraph::simulatedAnnealing(uint temperature)
 	bestCost = prevCost;
 
 	if (!temperature)
-		temperature = vertexNumber << 4;
+		temperature = vertexNumber << 10;
 
 	default_random_engine gen(uint(time(nullptr)));
 	uniform_real_distribution<double> doubleRnd(0.0, 1.0);
@@ -386,13 +386,19 @@ void MatrixGraph::simulatedAnnealing(uint temperature)
 
 	double duration = (clock() - overallTime) / (double)CLOCKS_PER_SEC;
 
-	cout << "\nDroga:\n";
-	for (uint i = 0; i < bestRoute.size(); ++i)
+	if(bestRoute.size() < 100)
 	{
-		if (i < bestRoute.size())
+		cout << "\nDroga:\n";
+		for (uint i = 0; i < bestRoute.size(); ++i)
+		{
 			cout << bestRoute[i] << " -> ";
+		}
+		cout << bestRoute[0] << endl;
 	}
-	cout << bestRoute[0] << endl;
+	else
+	{
+		cout << "Droga jest zbyt długa, aby ja wyswietlic\n";
+	}
 	cout << "Koszt drogi: " << bestCost << endl;
 	cout << "Calkowity czas trwania: " << duration << " sekund\n";
 }

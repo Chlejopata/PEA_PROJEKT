@@ -15,8 +15,9 @@ typedef uint pair[2];
 #include <thread>
 #include <limits>
 #include <queue>
+#include <cstring>
 #include "rapidxml.hpp"
-#include "rapidxml_iterators.hpp"
+//#include "rapidxml_iterators.hpp"
 #include "rapidxml_print.hpp"
 #include  "rapidxml_utils.hpp"
 
