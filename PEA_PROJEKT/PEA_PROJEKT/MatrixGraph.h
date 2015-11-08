@@ -15,7 +15,7 @@ public:
 
 	MatrixGraph & operator =(const MatrixGraph & mg);
 	void clone(const MatrixGraph &mg);
-	void readXml(const char* path);
+	bool readXml(const char* path);
 	void writeFile(ofstream &output);
 	void generateGraph(uint vertexNumber, bool symmetrical = true);
 	void output(bool noColor = false);

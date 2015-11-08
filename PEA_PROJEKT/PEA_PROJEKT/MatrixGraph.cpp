@@ -59,7 +59,7 @@ void MatrixGraph::clone(const MatrixGraph &mg)
 	}
 }
 
-void MatrixGraph::readXml(const char* path)
+bool MatrixGraph::readXml(const char* path)
 {
 	char* data = nullptr;
 	xml_document<> doc;
@@ -76,9 +76,10 @@ void MatrixGraph::readXml(const char* path)
 			delete[] data;
 		cin.get();
 		cin.ignore();
-		return;
+		return false;
 	}
 
+	bool retVal = false;
 	doc.parse<0>(data);
 
 	xml_node<>* node = doc.first_node("travellingSalesmanProblemInstance");
@@ -97,6 +98,7 @@ void MatrixGraph::readXml(const char* path)
 				for (; edge != nullptr; edge = edge->next_sibling("edge"))
 				{
 					matrix[vertex][atoi(edge->value())] = int(atof(edge->first_attribute("cost")->value()));
+					retVal = true;
 				}
 			}
 
@@ -104,11 +106,13 @@ void MatrixGraph::readXml(const char* path)
 			{
 				matrix[i][i] = -1;
 			}
+			
 		}
 	}
 
 	if (data)
 		delete[] data;
+	return retVal;
 }
 
 void MatrixGraph::writeFile(ofstream &output)
@@ -459,9 +463,8 @@ void MatrixGraph::simulatedAnnealing(uint temperature)
 	{
 	case 't':
 	case 'T':
-	{
 		printRoute(bestRoute);
-	}break;
+	break;
 	default:
 		break;
 	}

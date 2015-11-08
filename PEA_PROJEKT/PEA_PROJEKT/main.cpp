@@ -30,6 +30,7 @@ int main(int argc, char** argv)
 	else //menu
 	{
 		MatrixGraph graph;
+		bool isLoaded = false;
 		char menu;
 		do
 		{
@@ -52,10 +53,20 @@ int main(int argc, char** argv)
 			switch(menu)
 			{
 				case '1':
-					graph.readXml(getFileName().c_str());
+					if (!isLoaded)
+						isLoaded = graph.readXml(getFileName().c_str());
+					else
+						graph.readXml(getFileName().c_str());
 				break;
 				case '2':
-					graph.simulatedAnnealing();
+					if (isLoaded)
+						graph.simulatedAnnealing();
+					else
+					{
+						ConsoleAttributes::color(red);
+						cout << "Nie wczytano grafu" << endl;
+						ConsoleAttributes::setDefault();
+					}
 					cin.get();
 				break;
 				case '0':
