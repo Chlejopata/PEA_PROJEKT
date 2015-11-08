@@ -58,6 +58,7 @@ private:
 
 	static bool nextPermutation(uint *array, uint length);
 	static double acceptanceProbability(uint energy, uint newEnergy, uint temperature);
+	void printRoute(vector<uint> route, bool noColor = false);
 };
 
 #endif /* HEADERS_MATRIXGRAPH_H_ */

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "ConsoleAttributes.hpp"
 #include "MatrixGraph.h"
 
 bool MatrixGraph::rndSeed = false;
@@ -62,7 +63,14 @@ void MatrixGraph::readXml(const char* path)
 {
 	file<> xmlFile(path);
 	xml_document<> doc;
-	doc.parse<0>(xmlFile.data());
+	try
+	{
+		doc.parse<0>(xmlFile.data());
+	}
+	catch (runtime_error e)
+	{
+		cout << e.what() << endl;
+	}
 
 	xml_node<>* node = doc.first_node("travellingSalesmanProblemInstance");
 	if (node)
@@ -73,11 +81,6 @@ void MatrixGraph::readXml(const char* path)
 			uint vNum = count_children(node);
 			reserve(vNum);
 
-			for (uint i = 0; i < vertexNumber; i++)
-			{
-				matrix[i][i] = -1;
-			}
-
 			node = node->first_node("vertex");
 			for (uint vertex = 0; node != nullptr; node = node->next_sibling("vertex"), ++vertex)
 			{
@@ -86,6 +89,11 @@ void MatrixGraph::readXml(const char* path)
 				{
 					matrix[vertex][atoi(edge->value())] = int(atof(edge->first_attribute("cost")->value()));
 				}
+			}
+
+			for (uint i = 0; i < vertexNumber; i++)
+			{
+				matrix[i][i] = -1;
 			}
 		}
 	}
@@ -141,17 +149,60 @@ void MatrixGraph::output(bool noColor)
 	const uint columnValueWidth = (uint)(ceil(log10(columnMaxValue)) + 1);
 	const uint vertIndexWidth = (uint)(ceil(log10(vertexNumber - 1)));
 
-	if(! vertexNumber)
-		cout << "Brak grafu do wyświetlenia!\n\n";
+	if (!vertexNumber)
+	{
+		if (!noColor)
+			ConsoleAttributes::color(red);
+		cout << "Brak grafu do wyswietlenia!\n\n";
+		if (!noColor)
+			ConsoleAttributes::setDefault();
+	}
 
 	for (uint row = 0; row < vertexNumber; row++)
 	{
+		if (!noColor)
+			ConsoleAttributes::color(white);
 		cout.width(vertIndexWidth);
 		cout << row << ": ";
+		if (!noColor)
+			ConsoleAttributes::setDefault();
 		for (uint col = 0; col < vertexNumber; col++)
 		{
-			cout.width(columnValueWidth);
-			cout << matrix[row][col] << " ";
+			if (noColor)
+			{
+				cout.width(columnValueWidth);
+				cout << matrix[row][col] << " ";
+			}
+			else
+			{
+				if (row == col)
+				{
+					ConsoleAttributes::color(yellow, red);
+					cout.width(columnValueWidth);
+					cout << matrix[row][col] << " ";
+					ConsoleAttributes::setDefault();
+				}
+				else
+				{
+					if (row & 1)
+					{
+						if (col & 1)
+							ConsoleAttributes::color(green, black);
+						else
+							ConsoleAttributes::color(black, green);
+					}
+					else
+					{
+						if (col & 1)
+							ConsoleAttributes::color(black, green);
+						else
+							ConsoleAttributes::color(green, black);
+					}
+					cout.width(columnValueWidth);
+					cout << matrix[row][col] << " ";
+					ConsoleAttributes::setDefault();
+				}
+			}
 		}
 		cout << endl;
 	}
@@ -386,29 +437,23 @@ void MatrixGraph::simulatedAnnealing(uint temperature)
 
 	double duration = (clock() - overallTime) / (double)CLOCKS_PER_SEC;
 	char routeView = 't';
-	if(bestRoute.size() > 100)
+	if (bestRoute.size() > 100)
 	{
 		cout << "Droga jest zbyt dluga. Czy pomimo tego chcesz ja wyświetlic?[t]/[n]\n";
 		cin >> routeView;
 		cin.ignore();
 	}
-	switch(routeView)
+	switch (routeView)
 	{
-		case 't':
-		case 'T':
-		{
-			cout << "\nDroga:\n";
-			for (uint i = 0; i < bestRoute.size(); ++i)
-			{
-				cout << bestRoute[i] << " -> ";
-			}
-			cout << bestRoute[0] << endl;
-		}break;
-		default:
+	case 't':
+	case 'T':
+	{
+		printRoute(bestRoute);
+	}break;
+	default:
 		break;
-
 	}
-		
+
 	cout << "Koszt drogi: " << bestCost << endl;
 	cout << "Calkowity czas trwania: " << duration << " sekund\n";
 }
@@ -721,4 +766,41 @@ double MatrixGraph::acceptanceProbability(uint energy, uint newEnergy, uint temp
 	}
 	// If the new solution is worse, calculate an acceptance probability
 	return exp(double(energy - newEnergy) / double(temperature));
+}
+
+void MatrixGraph::printRoute(vector<uint> route, bool noColor)
+{
+	if (!noColor)
+		ConsoleAttributes::setDefault();
+	cout << "\nDroga:\n";
+	for (uint i = 0; i < route.size(); ++i)
+	{
+		if (!noColor)
+			ConsoleAttributes::color(green);
+		cout << "[" << route[i] << "]";
+		if (!noColor)
+			ConsoleAttributes::color(white);
+		cout << " -(";
+		if (i < route.size() - 1)
+		{
+			if (!noColor)
+				ConsoleAttributes::color(blue);
+			cout << getValue(i, i + 1);
+		}
+		else
+		{
+			if (!noColor)
+				ConsoleAttributes::color(blue);
+			cout << getValue(i, 0);
+		}
+		if (!noColor)
+			ConsoleAttributes::color(white);
+		cout << ")-> ";
+
+	}
+	if (!noColor)
+		ConsoleAttributes::color(green);
+	cout << "[" << route[0] << "]" << endl;
+	if (!noColor)
+		ConsoleAttributes::setDefault();
 }

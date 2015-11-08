@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "MatrixGraph.h"
-#include "ConsoleAtribiutes.hpp"
+//#include "concol.h"
+#include "ConsoleAttributes.hpp"
 
 using namespace std;
 
@@ -25,20 +26,20 @@ int main(int argc, char** argv)
 		char menu;
 		do
 		{
-			ConsoleAtribiutes::setDefault();
-			ConsoleAtribiutes::clearConsole();
-			ConsoleAtribiutes::color(BLUE, RED);
+			ConsoleAttributes::setDefault();
+			ConsoleAttributes::clearConsole();
+			ConsoleAttributes::color(yellow, red);
 			cout <<"Projektowanie Efektywnych Algorytmow - Projekt\nProwadzacy: dr Zbigniew Buchalski\nAutorzy: Bartosz Ciesla 209851 Bartosz Kardas 209913\n\n";
-			ConsoleAtribiutes::setDefault();
+			ConsoleAttributes::setDefault();
 			if(graph.getVertexNumber() <= 32)
 				graph.output();
 			else
 			{
-				ConsoleAtribiutes::color(RED);
-				cout << BLACK << "Nie mozna wyswietlic grafu. Graf jest zbyt duzy!\n\n";
-				ConsoleAtribiutes::setDefault();
+				ConsoleAttributes::color(red);
+				cout << "Nie mozna wyswietlic grafu. Graf jest zbyt duzy!\n\n";
+				ConsoleAttributes::setDefault();
 			}
-			cout<<"Menu:\n[1] Zaladuj graf z pliku\n[2] Algorytm symulowanego wyzarzania\n[0] Zakoncz\n";
+			cout<<"\nMenu:\n[1] Zaladuj graf z pliku\n[2] Algorytm symulowanego wyzarzania\n[0] Zakoncz\n";
 			cin >> menu;
 			cin.ignore();
 			switch(menu)
@@ -55,7 +56,7 @@ int main(int argc, char** argv)
 				break;
 			}
 		}while(menu != '0');
-		ConsoleAtribiutes::clearConsole();
+		ConsoleAttributes::clearConsole();
 	}
 
 	return 0;
