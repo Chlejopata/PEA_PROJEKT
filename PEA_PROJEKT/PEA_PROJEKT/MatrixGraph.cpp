@@ -61,26 +61,16 @@ void MatrixGraph::clone(const MatrixGraph &mg)
 
 void MatrixGraph::readXml(const char* path)
 {
-	char* data = nullptr;
-
+	file<> xmlFile(path);
+	xml_document<> doc;
 	try
 	{
-		file<> xmlFile(path);
-		data = new char[xmlFile.size()];
-		memcpy(data, xmlFile.data(), xmlFile.size());
+		doc.parse<0>(xmlFile.data());
 	}
 	catch (runtime_error e)
 	{
-		cout << "Nie mozna otworzyc pliku: \""<< path <<"\""<< endl;
-		if (data)
-			delete[] data;
-		cin.get();
-		cin.ignore();
-		return;
+		cout << e.what() << endl;
 	}
-
-	xml_document<> doc;
-	doc.parse<0>(data);
 
 	xml_node<>* node = doc.first_node("travellingSalesmanProblemInstance");
 	if (node)
@@ -107,9 +97,6 @@ void MatrixGraph::readXml(const char* path)
 			}
 		}
 	}
-
-	if (data)
-		delete[] data;
 }
 
 void MatrixGraph::writeFile(ofstream &output)
