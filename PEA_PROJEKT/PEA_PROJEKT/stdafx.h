@@ -21,6 +21,11 @@ typedef uint pair[2];
 #include "rapidxml_print.hpp"
 #include  "rapidxml_utils.hpp"
 
+#ifdef _WIN32
+	#define NOMINMAX
+	#include <windows.h>
+#endif
+
 using namespace std;
 using namespace rapidxml;
 

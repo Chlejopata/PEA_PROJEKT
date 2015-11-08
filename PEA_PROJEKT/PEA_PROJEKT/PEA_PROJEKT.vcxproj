@@ -64,10 +64,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ConsoleAttributes.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MatrixGraph.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ConsoleAttributes.hpp" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="MatrixGraph.h" />
     <ClInclude Include="rapidxml.hpp" />
