@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "MatrixGraph.h"
-//#include "concol.h"
+#include "Display.h"
 #include "ConsoleAttributes.hpp"
 
 using namespace std;
@@ -32,6 +32,7 @@ int main(int argc, char** argv)
 		MatrixGraph graph;
 		bool isLoaded = false;
 		char menu;
+
 		do
 		{
 			ConsoleAttributes::setDefault();
@@ -57,6 +58,7 @@ int main(int argc, char** argv)
 						isLoaded = graph.readXml(getFileName().c_str());
 					else
 						graph.readXml(getFileName().c_str());
+					//Display::initializeGraphics(&graph);
 				break;
 				case '2':
 					if (isLoaded)
@@ -79,3 +81,4 @@ int main(int argc, char** argv)
 
 	return 0;
 }
+

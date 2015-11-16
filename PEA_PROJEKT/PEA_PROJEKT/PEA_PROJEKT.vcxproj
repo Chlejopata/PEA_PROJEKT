@@ -65,18 +65,25 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleAttributes.cpp" />
+    <ClCompile Include="Display.cpp" />
+    <ClCompile Include="DisplayEdge.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MatrixGraph.cpp" />
+    <ClCompile Include="DisplayVertex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConsoleAttributes.hpp" />
+    <ClInclude Include="Display.h" />
+    <ClInclude Include="DisplayEdge.h" />
     <ClInclude Include="Edge.h" />
+    <ClInclude Include="graphics.hpp" />
     <ClInclude Include="MatrixGraph.h" />
     <ClInclude Include="rapidxml.hpp" />
     <ClInclude Include="rapidxml_iterators.hpp" />
     <ClInclude Include="rapidxml_print.hpp" />
     <ClInclude Include="rapidxml_utils.hpp" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="DisplayVertex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -10,15 +10,15 @@ typedef uint pair[2];
 #include <string>
 #include <sstream>
 #include <fstream>
-#include <cmath>
-#include <locale>
+//#include <cmath>
+//#include <locale>
 #include <thread>
 #include <limits>
 #include <queue>
 #include <cstring>
 #include "rapidxml.hpp"
 //#include "rapidxml_iterators.hpp"
-#include "rapidxml_print.hpp"
+//#include "rapidxml_print.hpp"
 #include  "rapidxml_utils.hpp"
 
 #ifdef _WIN32
