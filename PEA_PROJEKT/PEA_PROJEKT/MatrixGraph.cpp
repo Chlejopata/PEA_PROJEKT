@@ -458,14 +458,14 @@ Data MatrixGraph::tabuSearch(uint tabuListSize, uint iterations)
 {
 	clock_t overallTime = clock();
 	initRand();
+	if (!iterations)
+		iterations = vertexNumber << 2;
 	stringstream results;
 	vector<uint> currentPath, bestPath;
 	currentPath.reserve(vertexNumber), bestPath.reserve(vertexNumber);
 	//TabuArray tabuList(vertexNumber, tabuListSize);
 	TabuList tabuList(tabuListSize);
-	uint currentCost = 0, bestCost = 0;
-	if (!iterations)
-		iterations = vertexNumber << 2;
+	uint currentCost = 0, bestCost = 0, diverseLimit = (iterations >> 2) + 1, noChange = 0;
 
 	//	1 - Create an initial solution(could be created randomly), now call it the current solution.
 	for (uint i = 0; i < vertexNumber; ++i)
@@ -477,6 +477,7 @@ Data MatrixGraph::tabuSearch(uint tabuListSize, uint iterations)
 	for (uint i = 0; i < iterations; ++i)
 	{
 		//	2 - Find the best neighbor of the current solution by applying certain moves.
+
 		currentCost = getBestNeighbour(tabuList, currentPath);
 
 		//	3 - If the best neighbor is reached my performing a non - tabu move, accept as the new current solution.
@@ -485,6 +486,17 @@ Data MatrixGraph::tabuSearch(uint tabuListSize, uint iterations)
 		{
 			bestPath = currentPath;
 			bestCost = currentCost;
+			noChange = 0;
+		}
+		else
+		{
+			if (++noChange > diverseLimit)
+			{
+				random_shuffle(currentPath.begin(), currentPath.end());
+				currentCost = calculateCost(currentPath);
+				tabuList.clear();
+				noChange = 0;
+			}
 		}
 	}
 	//	4 - If maximum number of iterations are reached(or any other stopping condition), go to 5, else go to 2.
@@ -767,7 +779,7 @@ uint MatrixGraph::getBestNeighbour(TabuContainer &tabuList, vector<uint> &curren
 
 	for (uint row = 1; row < vertexNumber; ++row)
 	{
-		for (uint col = 2; col < vertexNumber; ++col)
+		for (uint col = row + 1; col < vertexNumber; ++col)
 		{
 			if (row == col)
 				continue;
@@ -775,11 +787,11 @@ uint MatrixGraph::getBestNeighbour(TabuContainer &tabuList, vector<uint> &curren
 			iter_swap(newPath.begin() + row, newPath.begin() + col);
 			uint newCost = calculateCost(newPath);
 
-			if ((newCost < resultCost || first) && !tabuList.getTabu(row, col)) 
+			if ((newCost < resultCost || first) && !tabuList.getTabu(newPath[row], newPath[col]))
 			{
 				first = false;
-				v1 = row;
-				v2 = col;
+				v1 = newPath[row];
+				v2 = newPath[col];
 				resultPath = newPath;
 				resultCost = newCost;
 			}

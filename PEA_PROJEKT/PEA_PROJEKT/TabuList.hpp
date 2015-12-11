@@ -12,6 +12,7 @@ public:
 	TabuList(uint tabuTime)
 	{
 		this->tabuTime = tabuTime;
+		listSize = 0;
 	}
 
 	bool getTabu(uint first, uint second)
@@ -28,12 +29,22 @@ public:
 	void setTabu(uint first, uint second)
 	{
 		tabuList.push_front(tuple<int, int>(first, second));
+		++listSize;
 	}
 
 	void decrementTabu()
 	{
 		if (listSize > tabuTime)
+		{
 			tabuList.pop_back();
+			--listSize;
+		}
+	}
+
+	void clear()
+	{
+		tabuList.clear();
+		listSize = 0;
 	}
 private:
 	list<tuple<int, int>> tabuList;

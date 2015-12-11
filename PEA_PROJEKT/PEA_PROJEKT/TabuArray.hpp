@@ -39,6 +39,11 @@ public:
 			}
 		}
 	}
+
+	void clear()
+	{
+		tabuArray.clear();
+	}
 private:
 	vector<vector<int>> tabuArray;
 };
