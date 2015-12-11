@@ -3,19 +3,19 @@
 #include "Display.h"
 #include "ConsoleAttributes.hpp"
 
+char menuString[] = 
+{ "\nMenu:\n[1] Zaladuj graf z pliku"
+"\n[2] Algorytm symulowanego wyzarzania"
+"\n[3] Algorytm tabu search"
+"\n[0] Zakoncz\n" };
+
 using namespace std;
 
-string getFileName()
-{
-	cout << "Podaj nazwe pliku wraz ze sciezka: ";
-	string s;
-	cin >> s;
-	return s;
-}
+string getFileName();
+void printResults(bool isLoaded, Data &data, MatrixGraph &graph);
 
 int main(int argc, char** argv)
 {
-
 	if(argc > 1) //testowanie
 	{
 		srand(time(NULL));
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 				cout << "Nie mozna wyswietlic grafu. Graf jest zbyt duzy!\n\n";
 				ConsoleAttributes::setDefault();
 			}
-			cout<<"\nMenu:\n[1] Zaladuj graf z pliku\n[2] Algorytm symulowanego wyzarzania\n[0] Zakoncz\n";
+			cout<<menuString;
 			cin >> menu;
 			cin.ignore();
 			switch(menu)
@@ -61,16 +61,11 @@ int main(int argc, char** argv)
 					//Display::initializeGraphics(&graph);
 				break;
 				case '2':
-					if (isLoaded)
-						graph.simulatedAnnealing();
-					else
-					{
-						ConsoleAttributes::color(red);
-						cout << "Nie wczytano grafu" << endl;
-						ConsoleAttributes::setDefault();
-					}
-					cin.get();
+					printResults(isLoaded, graph.simulatedAnnealing(), graph);
 				break;
+				case '3':
+					printResults(isLoaded, graph.tabuSearch(), graph);
+					break;
 				case '0':
 				default:
 				break;
@@ -82,3 +77,41 @@ int main(int argc, char** argv)
 	return 0;
 }
 
+string getFileName()
+{
+	cout << "Podaj nazwe pliku wraz ze sciezka: ";
+	string s;
+	cin >> s;
+	return s;
+}
+
+void printResults(bool isLoaded, Data &data, MatrixGraph &graph)
+{
+	if (isLoaded)
+	{
+		char routeView = 't';
+		if (data.path.size() > 100)
+		{
+			cout << "Droga jest zbyt dluga. Czy pomimo tego chcesz ja wyœwietlic?[t]/[n]\n";
+			cin >> routeView;
+			cin.ignore();
+		}
+		switch (routeView)
+		{
+		case 't':
+		case 'T':
+			graph.printRoute(data.path);
+			break;
+		default:
+			break;
+		}
+		cout << data << endl;
+	}
+	else
+	{
+		ConsoleAttributes::color(red);
+		cout << "Nie wczytano grafu" << endl;
+		ConsoleAttributes::setDefault();
+	}
+	cin.get();
+}

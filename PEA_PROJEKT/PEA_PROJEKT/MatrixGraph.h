@@ -2,6 +2,8 @@
 #define HEADERS_MATRIXGRAPH_H_
 
 #include "Edge.h"
+#include "Data.hpp"
+#include "TabuList.hpp"
 
 class TspNode;
 
@@ -22,7 +24,8 @@ public:
 
 	void bruteForce(bool printProgress, bool print);
 	uint greedyAlg(vector<uint> &bestRoute);
-	void simulatedAnnealing(uint temperature = 0);
+	Data simulatedAnnealing(uint temperature = 0);
+	Data tabuSearch(uint tabuListSize = 5, uint iterations = 0);
 
 	int getValue(uint row, uint col);
 
@@ -31,6 +34,7 @@ public:
 	uint getVertexNumber();
 	uint minimizeCost();
 
+	void printRoute(vector<uint> route, bool noColor = false);
 protected:
 	bool reserve(uint vNumber = 0);
 	void purge();
@@ -53,12 +57,14 @@ private:
 	void setCol(uint col, int value = -1);
 	void setValue(uint row, uint col, int value = -1);
 
+	uint getBestNeighbour(TabuList &tabuList, vector<uint> &currentPath);
+
 	long noRepeatDraw(bool* drawn, uint length);
-	uint calculateCost(vector<uint> path);
+	uint calculateCost(vector<uint> &path);
 
 	static bool nextPermutation(uint *array, uint length);
 	static double acceptanceProbability(uint energy, uint newEnergy, uint temperature);
-	void printRoute(vector<uint> route, bool noColor = false);
+	static void initRand();
 };
 
 #endif /* HEADERS_MATRIXGRAPH_H_ */

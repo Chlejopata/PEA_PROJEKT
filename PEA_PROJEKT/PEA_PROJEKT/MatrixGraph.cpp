@@ -7,13 +7,6 @@ bool MatrixGraph::rndSeed = false;
 
 MatrixGraph::MatrixGraph(uint vertexNumber)
 {
-	// Jeśli random seed nie został zainicjowany
-	if (!MatrixGraph::rndSeed)
-	{
-		srand((unsigned int)time(NULL));
-		MatrixGraph::rndSeed = true;
-	}
-
 	this->vertexNumber = 0;
 	this->matrix = nullptr;
 
@@ -399,10 +392,14 @@ uint MatrixGraph::greedyAlg(vector<uint> &bestRoute)
 	return bestWeight;
 }
 
-void MatrixGraph::simulatedAnnealing(uint temperature)
+Data MatrixGraph::simulatedAnnealing(uint temperature)
 {
 	clock_t overallTime = clock();
+	initRand();
+	stringstream results;
 	vector<uint> route, bestRoute;
+	route.reserve(vertexNumber);
+	bestRoute.reserve(vertexNumber);
 	uint prevCost = greedyAlg(route), bestCost;
 	route.pop_back();
 	bestRoute = route;
@@ -452,25 +449,48 @@ void MatrixGraph::simulatedAnnealing(uint temperature)
 	}
 
 	double duration = (clock() - overallTime) / (double)CLOCKS_PER_SEC;
-	char routeView = 't';
-	if (bestRoute.size() > 100)
-	{
-		cout << "Droga jest zbyt dluga. Czy pomimo tego chcesz ja wyświetlic?[t]/[n]\n";
-		cin >> routeView;
-		cin.ignore();
-	}
-	switch (routeView)
-	{
-	case 't':
-	case 'T':
-		printRoute(bestRoute);
-	break;
-	default:
-		break;
-	}
+	results << "Koszt drogi: " << bestCost << "\nCalkowity czas trwania: " << duration << " sekund\n";
+	return Data(bestRoute, bestCost, results.str(), duration);
+	
+}
 
-	cout << "Koszt drogi: " << bestCost << endl;
-	cout << "Calkowity czas trwania: " << duration << " sekund\n";
+Data MatrixGraph::tabuSearch(uint tabuListSize, uint iterations)
+{
+	clock_t overallTime = clock();
+	initRand();
+	stringstream results;
+	vector<uint> currentPath, bestPath;
+	currentPath.reserve(vertexNumber), bestPath.reserve(vertexNumber);
+	TabuList tabuList(vertexNumber, tabuListSize);
+	uint currentCost = 0, bestCost = 0;
+	if (!iterations)
+		iterations = vertexNumber << 2;
+
+	//	1 - Create an initial solution(could be created randomly), now call it the current solution.
+	for (uint i = 0; i < vertexNumber; ++i)
+		currentPath.push_back(i);
+	currentCost = calculateCost(currentPath);
+	bestPath = currentPath;
+	bestCost = currentCost;
+
+	for (uint i = 0; i < iterations; ++i)
+	{
+		//	2 - Find the best neighbor of the current solution by applying certain moves.
+		currentCost = getBestNeighbour(tabuList, currentPath);
+
+		//	3 - If the best neighbor is reached my performing a non - tabu move, accept as the new current solution.
+		// else, find another neighbor(best non - tabu neighbour).
+		if (currentCost < bestCost) 
+		{
+			bestPath = currentPath;
+			bestCost = currentCost;
+		}
+	}
+	//	4 - If maximum number of iterations are reached(or any other stopping condition), go to 5, else go to 2.
+	//	5 - Globally best solution is the best solution we found throughout the iterations.
+	double duration = (clock() - overallTime) / (double)CLOCKS_PER_SEC;
+	results << "Koszt drogi: " << bestCost << "\nCalkowity czas trwania: " << duration << " sekund\n";
+	return Data(bestPath, bestCost, results.str(), duration);
 }
 
 int MatrixGraph::getValue(uint row, uint col)
@@ -498,6 +518,77 @@ vector<Edge> MatrixGraph::getEdges(uint vertex)
 uint MatrixGraph::getVertexNumber()
 {
 	return vertexNumber;
+}
+
+uint MatrixGraph::minimizeCost()
+{
+	/*cout << "\n----------------------------------------" << endl;
+	cout << "BEFORE minimizeCost():\n";
+	output();*/
+	uint lowerBound = 0;
+	// Minimalizacja kosztów w wierszach
+	for (uint row = 0; row < vertexNumber; row++)
+	{
+		int tmp = getLowestInRow(row);
+		if (tmp > 0)
+		{
+			lowerBound += tmp;
+			substractFormRow(row, tmp);
+		}
+	}
+
+	// Minimalizacja kosztów w kolumnach
+	for (uint col = 0; col < vertexNumber; col++)
+	{
+		int tmp = getLowestInCol(col);
+		if (tmp > 0)
+		{
+			lowerBound += tmp;
+			substractFormCol(col, tmp);
+		}
+	}
+
+	/*cout << "\nAFTER minimizeCost():\n";
+	output();
+	cout <<"lowerBound:"<<lowerBound<<"\n----------------------------------------" <<endl;*/
+	return lowerBound;
+}
+
+void MatrixGraph::printRoute(vector<uint> route, bool noColor)
+{
+	if (!noColor)
+		ConsoleAttributes::setDefault();
+	cout << "\nDroga:\n";
+	for (uint i = 0; i < route.size(); ++i)
+	{
+		if (!noColor)
+			ConsoleAttributes::color(green);
+		cout << "[" << route[i] << "]";
+		if (!noColor)
+			ConsoleAttributes::color(white);
+		cout << " -(";
+		if (i < route.size() - 1)
+		{
+			if (!noColor)
+				ConsoleAttributes::color(blue);
+			cout << getValue(i, i + 1);
+		}
+		else
+		{
+			if (!noColor)
+				ConsoleAttributes::color(blue);
+			cout << getValue(i, 0);
+		}
+		if (!noColor)
+			ConsoleAttributes::color(white);
+		cout << ")-> ";
+
+	}
+	if (!noColor)
+		ConsoleAttributes::color(green);
+	cout << "[" << route[0] << "]" << endl;
+	if (!noColor)
+		ConsoleAttributes::setDefault();
 }
 
 // PROTECTED
@@ -665,38 +756,43 @@ void MatrixGraph::setValue(uint row, uint col, int value)
 		matrix[row][col] = value;
 }
 
-uint MatrixGraph::minimizeCost()
+uint MatrixGraph::getBestNeighbour(TabuList &tabuList, vector<uint> &currentPath)
 {
-	/*cout << "\n----------------------------------------" << endl;
-	cout << "BEFORE minimizeCost():\n";
-	output();*/
-	uint lowerBound = 0;
-	// Minimalizacja kosztów w wierszach
-	for (uint row = 0; row < vertexNumber; row++)
+	vector<uint> resultPath = currentPath;
+	uint currentCost = calculateCost(currentPath);
+	uint resultCost = currentCost;
+	bool first = true;
+	uint v1 = 0, v2 = 0;
+
+	for (uint row = 1; row < vertexNumber; ++row)
 	{
-		int tmp = getLowestInRow(row);
-		if (tmp > 0)
+		for (uint col = 2; col < vertexNumber; ++col)
 		{
-			lowerBound += tmp;
-			substractFormRow(row, tmp);
+			if (row == col)
+				continue;
+			vector<uint> newPath(currentPath);
+			iter_swap(newPath.begin() + row, newPath.begin() + col);
+			uint newCost = calculateCost(newPath);
+
+			if ((newCost < resultCost || first) && !tabuList.getTabu(row, col)) 
+			{
+				first = false;
+				v1 = row;
+				v2 = col;
+				resultPath = newPath;
+				resultCost = newCost;
+			}
 		}
 	}
 
-	// Minimalizacja kosztów w kolumnach
-	for (uint col = 0; col < vertexNumber; col++)
+	if (v1)
 	{
-		int tmp = getLowestInCol(col);
-		if (tmp > 0)
-		{
-			lowerBound += tmp;
-			substractFormCol(col, tmp);
-		}
+		tabuList.decrementTabu();
+		tabuList.setTabu(v1, v2);
 	}
 
-	/*cout << "\nAFTER minimizeCost():\n";
-	output();
-	cout <<"lowerBound:"<<lowerBound<<"\n----------------------------------------" <<endl;*/
-	return lowerBound;
+	currentPath = resultPath;
+	return currentCost;
 }
 
 long MatrixGraph::noRepeatDraw(bool* drawn, uint length)
@@ -726,7 +822,7 @@ long MatrixGraph::noRepeatDraw(bool* drawn, uint length)
 	return retVal;
 }
 
-uint MatrixGraph::calculateCost(vector<uint> path)
+uint MatrixGraph::calculateCost(vector<uint> &path)
 {
 	uint cost = 0;
 	for (uint i = 1; i < path.size(); i++)
@@ -783,39 +879,12 @@ double MatrixGraph::acceptanceProbability(uint energy, uint newEnergy, uint temp
 	return exp(double(energy - newEnergy) / double(temperature));
 }
 
-void MatrixGraph::printRoute(vector<uint> route, bool noColor)
+void MatrixGraph::initRand()
 {
-	if (!noColor)
-		ConsoleAttributes::setDefault();
-	cout << "\nDroga:\n";
-	for (uint i = 0; i < route.size(); ++i)
+	// Jeśli random seed nie został zainicjowany
+	if (!rndSeed)
 	{
-		if (!noColor)
-			ConsoleAttributes::color(green);
-		cout << "[" << route[i] << "]";
-		if (!noColor)
-			ConsoleAttributes::color(white);
-		cout << " -(";
-		if (i < route.size() - 1)
-		{
-			if (!noColor)
-				ConsoleAttributes::color(blue);
-			cout << getValue(i, i + 1);
-		}
-		else
-		{
-			if (!noColor)
-				ConsoleAttributes::color(blue);
-			cout << getValue(i, 0);
-		}
-		if (!noColor)
-			ConsoleAttributes::color(white);
-		cout << ")-> ";
-
+		srand((unsigned int)time(NULL));
+		rndSeed = true;
 	}
-	if (!noColor)
-		ConsoleAttributes::color(green);
-	cout << "[" << route[0] << "]" << endl;
-	if (!noColor)
-		ConsoleAttributes::setDefault();
 }
