@@ -461,7 +461,8 @@ Data MatrixGraph::tabuSearch(uint tabuListSize, uint iterations)
 	stringstream results;
 	vector<uint> currentPath, bestPath;
 	currentPath.reserve(vertexNumber), bestPath.reserve(vertexNumber);
-	TabuList tabuList(vertexNumber, tabuListSize);
+	//TabuArray tabuList(vertexNumber, tabuListSize);
+	TabuList tabuList(tabuListSize);
 	uint currentCost = 0, bestCost = 0;
 	if (!iterations)
 		iterations = vertexNumber << 2;
@@ -756,7 +757,7 @@ void MatrixGraph::setValue(uint row, uint col, int value)
 		matrix[row][col] = value;
 }
 
-uint MatrixGraph::getBestNeighbour(TabuList &tabuList, vector<uint> &currentPath)
+uint MatrixGraph::getBestNeighbour(TabuContainer &tabuList, vector<uint> &currentPath)
 {
 	vector<uint> resultPath = currentPath;
 	uint currentCost = calculateCost(currentPath);

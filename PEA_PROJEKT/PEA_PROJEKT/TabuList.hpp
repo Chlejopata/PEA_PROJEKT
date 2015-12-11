@@ -2,43 +2,42 @@
 #define HEADERS_TABULIST_H_
 
 #include "stdafx.h"
+#include "TabuContainer.hpp"
+#include <list>
+#include <tuple>
 
-class TabuList
+class TabuList : public TabuContainer
 {
 public:
-	TabuList(uint size, uint tabuTime)
+	TabuList(uint tabuTime)
 	{
-		tabuArray = vector<vector<int>>(size, vector<int>(size, 0));
 		this->tabuTime = tabuTime;
 	}
 
-	int getTabu(uint first, uint second)
+	bool getTabu(uint first, uint second)
 	{
-		return tabuArray[first][second];
+		for (tuple<int, int> &t : tabuList)
+		{
+			int t1 = get<0>(t), t2 = get<1>(t);
+			if ((t1 == first && t2 == second) || (t2 == first && t1 == second))
+				return true;
+		}
+		return false;
 	}
 
 	void setTabu(uint first, uint second)
 	{
-		tabuArray[first][second] = tabuTime;
-		tabuArray[second][first] = tabuTime;
+		tabuList.push_front(tuple<int, int>(first, second));
 	}
 
 	void decrementTabu()
 	{
-		for (auto &row : tabuArray)
-		{
-			for (auto &col : row)
-			{
-				if (col > 0)
-					--col;
-				else if (col < 0)
-					col = 0;
-			}
-		}
+		if (listSize > tabuTime)
+			tabuList.pop_back();
 	}
 private:
-	vector<vector<int>> tabuArray;
-	uint tabuTime;
+	list<tuple<int, int>> tabuList;
+	uint listSize;
 };
 
 #endif

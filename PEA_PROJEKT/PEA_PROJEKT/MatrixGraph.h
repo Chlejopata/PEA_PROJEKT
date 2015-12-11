@@ -4,6 +4,7 @@
 #include "Edge.h"
 #include "Data.hpp"
 #include "TabuList.hpp"
+#include "TabuArray.hpp"
 
 class TspNode;
 
@@ -57,7 +58,7 @@ private:
 	void setCol(uint col, int value = -1);
 	void setValue(uint row, uint col, int value = -1);
 
-	uint getBestNeighbour(TabuList &tabuList, vector<uint> &currentPath);
+	uint getBestNeighbour(TabuContainer &tabuList, vector<uint> &currentPath);
 
 	long noRepeatDraw(bool* drawn, uint length);
 	uint calculateCost(vector<uint> &path);

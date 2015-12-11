@@ -77,5 +77,11 @@
     <ClInclude Include="TabuList.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TabuArray.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TabuContainer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
