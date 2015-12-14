@@ -6,7 +6,7 @@
 class Data
 {
 public:
-	Data(vector<uint> &path = vector<uint>(), uint cost = 0, string results = "", double duration = 0.0)
+	Data(const vector<unsigned> &path = vector<unsigned>(), unsigned cost = 0, string results = "", double duration = 0.0)
 	{
 		this->path = path;
 		this->cost = cost;
@@ -14,8 +14,8 @@ public:
 		this->duration = duration;
 	}
 
-	vector<uint> path;
-	uint cost;
+	vector<unsigned> path;
+	unsigned cost;
 	string results;
 	double duration;
 
