@@ -5,6 +5,7 @@ typedef unsigned int uint;
 typedef unsigned long ulong;
 typedef uint pair[2];
 
+#include <algorithm>
 #include <random>
 #include <iostream>
 #include <string>

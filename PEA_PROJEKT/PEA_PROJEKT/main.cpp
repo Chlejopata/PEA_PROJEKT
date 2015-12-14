@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "MatrixGraph.h"
-#include "Display.h"
+//#include "Display.h"
+
 #include "ConsoleAttributes.hpp"
 
 char menuString[] = 
@@ -12,7 +13,7 @@ char menuString[] =
 using namespace std;
 
 string getFileName();
-void printResults(bool isLoaded, Data &data, MatrixGraph &graph);
+void printResults(bool isLoaded, Data data, MatrixGraph &graph);
 
 int main(int argc, char** argv)
 {
@@ -85,7 +86,7 @@ string getFileName()
 	return s;
 }
 
-void printResults(bool isLoaded, Data &data, MatrixGraph &graph)
+void printResults(bool isLoaded, Data data, MatrixGraph &graph)
 {
 	if (isLoaded)
 	{
