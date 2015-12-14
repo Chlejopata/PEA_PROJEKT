@@ -1,3 +1,4 @@
+#ifndef _WIN64
 #include "Display.h"
 
 MatrixGraph* Display::mg = nullptr;
@@ -86,3 +87,5 @@ void Display::initializeGraphics(MatrixGraph *mg)
 	glEnable(GL_DEPTH_TEST);
 	glutMainLoop();
 }
+
+#endif

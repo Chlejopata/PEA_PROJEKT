@@ -64,7 +64,7 @@ bool MatrixGraph::readXml(const char* path)
 	}
 	catch (runtime_error e)
 	{
-		cout << "Nie mozna otworzyc pliku: "<< path << endl;
+		cout << "Nie mozna otworzyc pliku: " << path << endl;
 		if (data)
 			delete[] data;
 		cin.get();
@@ -99,7 +99,7 @@ bool MatrixGraph::readXml(const char* path)
 			{
 				matrix[i][i] = -1;
 			}
-			
+
 		}
 	}
 
@@ -451,7 +451,7 @@ Data MatrixGraph::simulatedAnnealing(uint temperature)
 	double duration = (clock() - overallTime) / (double)CLOCKS_PER_SEC;
 	results << "Koszt drogi: " << bestCost << "\nCalkowity czas trwania: " << duration << " sekund\n";
 	return Data(bestRoute, bestCost, results.str(), duration);
-	
+
 }
 
 Data MatrixGraph::tabuSearch(uint tabuListSize, uint iterations)
@@ -459,7 +459,8 @@ Data MatrixGraph::tabuSearch(uint tabuListSize, uint iterations)
 	clock_t overallTime = clock();
 	initRand();
 	if (!iterations)
-		iterations = vertexNumber << 2;
+		iterations = vertexNumber << 5;
+	//iterations = 50;
 	stringstream results;
 	vector<uint> currentPath, bestPath;
 	currentPath.reserve(vertexNumber), bestPath.reserve(vertexNumber);
@@ -482,7 +483,7 @@ Data MatrixGraph::tabuSearch(uint tabuListSize, uint iterations)
 
 		//	3 - If the best neighbor is reached my performing a non - tabu move, accept as the new current solution.
 		// else, find another neighbor(best non - tabu neighbour).
-		if (currentCost < bestCost) 
+		if (currentCost < bestCost)
 		{
 			bestPath = currentPath;
 			bestCost = currentCost;
@@ -777,25 +778,23 @@ uint MatrixGraph::getBestNeighbour(TabuContainer &tabuList, vector<uint> &curren
 	bool first = true;
 	uint v1 = 0, v2 = 0;
 
-	for (uint row = 1; row < vertexNumber; ++row)
-	{
-		for (uint col = row + 1; col < vertexNumber; ++col)
-		{
-			if (row == col)
-				continue;
-			vector<uint> newPath(currentPath);
-			iter_swap(newPath.begin() + row, newPath.begin() + col);
-			uint newCost = calculateCost(newPath);
 
-			if ((newCost < resultCost || first) && !tabuList.getTabu(newPath[row], newPath[col]))
-			{
-				first = false;
-				v1 = newPath[row];
-				v2 = newPath[col];
-				resultPath = newPath;
-				resultCost = newCost;
-			}
-		}
+	uint row = (rand() % (vertexNumber - 1)) + 1;
+	uint col = (rand() % (vertexNumber - 2)) + 1;
+	if (row == col)
+		++col;
+
+	vector<uint> newPath(currentPath);
+	iter_swap(newPath.begin() + row, newPath.begin() + col);
+	uint newCost = calculateCost(newPath);
+
+	if ((newCost < resultCost || first) && !tabuList.getTabu(newPath[row], newPath[col]))
+	{
+		first = false;
+		v1 = newPath[row];
+		v2 = newPath[col];
+		resultPath = newPath;
+		resultCost = newCost;
 	}
 
 	if (v1)

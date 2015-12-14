@@ -1,3 +1,4 @@
+#ifndef _WIN64
 #pragma once
 #include "stdafx.h"
 #include "MatrixGraph.h"
@@ -25,3 +26,4 @@ private:
 	static vector<DisplayEdge> edges;
 };
 
+#endif

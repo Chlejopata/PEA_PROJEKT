@@ -1,3 +1,4 @@
+#ifndef _WIN64
 #include "DisplayVertex.h"
 
 
@@ -21,3 +22,4 @@ void DisplayVertex::draw()
 	glVertex2d(x + 5.0, y - 5.0);
 	glEnd();
 }
+#endif
