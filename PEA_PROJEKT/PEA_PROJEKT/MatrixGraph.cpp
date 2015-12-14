@@ -459,7 +459,7 @@ Data MatrixGraph::tabuSearch(uint tabuListSize, uint iterations)
 	clock_t overallTime = clock();
 	initRand();
 	if (!iterations)
-		iterations = vertexNumber << 5;
+		iterations = 1 << 10;
 	//iterations = 50;
 	stringstream results;
 	vector<uint> currentPath, bestPath;
@@ -780,21 +780,24 @@ uint MatrixGraph::getBestNeighbour(TabuContainer &tabuList, vector<uint> &curren
 
 
 	uint row = (rand() % (vertexNumber - 1)) + 1;
-	uint col = (rand() % (vertexNumber - 2)) + 1;
-	if (row == col)
-		++col;
+	//uint col = (rand() % (vertexNumber - 2)) + 1;
+	//if (col >= row)
+	//	++col;
 
-	vector<uint> newPath(currentPath);
-	iter_swap(newPath.begin() + row, newPath.begin() + col);
-	uint newCost = calculateCost(newPath);
-
-	if ((newCost < resultCost || first) && !tabuList.getTabu(newPath[row], newPath[col]))
+	for (uint col = 1; col < vertexNumber; ++col)
 	{
-		first = false;
-		v1 = newPath[row];
-		v2 = newPath[col];
-		resultPath = newPath;
-		resultCost = newCost;
+		vector<uint> newPath(currentPath);
+		iter_swap(newPath.begin() + row, newPath.begin() + col);
+		uint newCost = calculateCost(newPath);
+
+		if ((newCost < resultCost || first) && !tabuList.getTabu(newPath[row], newPath[col]))
+		{
+			first = false;
+			v1 = newPath[row];
+			v2 = newPath[col];
+			resultPath = newPath;
+			resultCost = newCost;
+		}
 	}
 
 	if (v1)
