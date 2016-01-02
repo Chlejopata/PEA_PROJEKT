@@ -5,6 +5,7 @@
 #include "Data.hpp"
 #include "TabuList.hpp"
 #include "TabuArray.hpp"
+#include "Specimen.hpp"
 
 class TspNode;
 
@@ -27,6 +28,7 @@ public:
 	uint greedyAlg(vector<uint> &bestRoute);
 	Data simulatedAnnealing(uint temperature = 0);
 	Data tabuSearch(uint tabuListSize = 5, uint iterations = 0);
+	Data genetic(uint populationSize);
 
 	int getValue(uint row, uint col);
 
@@ -59,6 +61,8 @@ private:
 	void setValue(uint row, uint col, int value = -1);
 
 	uint getBestNeighbour(TabuContainer &tabuList, vector<uint> &currentPath);
+
+	vector<Specimen> randomizePopulation(uint numberOfSpecimen);
 
 	long noRepeatDraw(bool* drawn, uint length);
 	uint calculateCost(vector<uint> &path);

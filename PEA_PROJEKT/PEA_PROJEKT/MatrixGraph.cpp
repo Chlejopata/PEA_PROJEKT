@@ -466,7 +466,7 @@ Data MatrixGraph::tabuSearch(uint tabuListSize, uint iterations)
 	currentPath.reserve(vertexNumber), bestPath.reserve(vertexNumber);
 	//TabuArray tabuList(vertexNumber, tabuListSize);
 	TabuList tabuList(tabuListSize);
-	uint currentCost = 0, bestCost = 0, diverseLimit = (iterations >> 2) + 1, noChange = 0;
+	uint currentCost = 0, bestCost = 0, diverseLimit = (iterations >> 4) + 1, noChange = 0;
 
 	//	1 - Create an initial solution(could be created randomly), now call it the current solution.
 	for (uint i = 0; i < vertexNumber; ++i)
@@ -505,6 +505,27 @@ Data MatrixGraph::tabuSearch(uint tabuListSize, uint iterations)
 	double duration = (clock() - overallTime) / (double)CLOCKS_PER_SEC;
 	results << "Koszt drogi: " << bestCost << "\nCalkowity czas trwania: " << duration << " sekund\n";
 	return Data(bestPath, bestCost, results.str(), duration);
+}
+
+Data MatrixGraph::genetic(uint populationSize)
+{
+	//1. Losowana jest pewna populacja początkowa.
+	auto startingPopulation = randomizePopulation(populationSize);
+
+	//2. Populacja poddawana jest ocenie(selekcja).
+	//   Najlepiej przystosowane osobniki biorą udział w procesie reprodukcji.
+
+
+	//3. Genotypy wybranych osobników poddawane są operatorom ewolucyjnym :
+	//	a. są ze sobą kojarzone poprzez złączanie genotypów rodziców(krzyżowanie),
+	//	b. przeprowadzana jest mutacja, czyli wprowadzenie drobnych losowych zmian.
+
+	//4. Rodzi się drugie(kolejne) pokolenie. Aby utrzymać stałą liczbę osobników 
+	//   w populacji te najlepsze(według funkcji oceniającej fenotyp) są powielane, 
+	//   a najsłabsze usuwane. Jeżeli nie znaleziono dostatecznie dobrego rozwiązania, 
+	//   algorytm powraca do kroku drugiego. W przeciwnym wypadku wybieramy 
+	//   najlepszego osobnika z populacji - jego genotyp to uzyskany wynik.
+
 }
 
 int MatrixGraph::getValue(uint row, uint col)
@@ -808,6 +829,16 @@ uint MatrixGraph::getBestNeighbour(TabuContainer &tabuList, vector<uint> &curren
 
 	currentPath = resultPath;
 	return currentCost;
+}
+
+vector<Specimen> MatrixGraph::randomizePopulation(uint numberOfSpecimen)
+{
+	vector<Specimen> specimenArray(numberOfSpecimen);
+
+	for (auto &el : specimenArray)
+		el = Specimen(vertexNumber);
+
+	return specimenArray;
 }
 
 long MatrixGraph::noRepeatDraw(bool* drawn, uint length)

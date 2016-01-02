@@ -123,6 +123,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MatrixGraph.cpp" />
     <ClCompile Include="DisplayVertex.cpp" />
+    <ClCompile Include="Specimen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConsoleAttributes.hpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="rapidxml_iterators.hpp" />
     <ClInclude Include="rapidxml_print.hpp" />
     <ClInclude Include="rapidxml_utils.hpp" />
+    <ClInclude Include="Specimen.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="DisplayVertex.h" />
     <ClInclude Include="TabuArray.hpp" />
