@@ -509,12 +509,24 @@ Data MatrixGraph::tabuSearch(uint tabuListSize, uint iterations)
 
 Data MatrixGraph::genetic(uint populationSize)
 {
+	clock_t overallTime = clock();
+	stringstream results;
+	vector<uint> bestPath(1);
+	uint bestCost = 0;
 	//1. Losowana jest pewna populacja początkowa.
 	auto startingPopulation = randomizePopulation(populationSize);
 
 	//2. Populacja poddawana jest ocenie(selekcja).
 	//   Najlepiej przystosowane osobniki biorą udział w procesie reprodukcji.
+	
+	Specimen p1(vertexNumber), p2(vertexNumber);
+	Specimen::Children2 children;
 
+	Specimen::crossover(p1, p2, children);
+
+	cout << "Rodzice:\n1: " << p1 << "\n2: " << p2;
+	cout << "\nDzieci:\n1: " << children[0] << "\n2: " << children[1] << endl;
+	
 
 	//3. Genotypy wybranych osobników poddawane są operatorom ewolucyjnym :
 	//	a. są ze sobą kojarzone poprzez złączanie genotypów rodziców(krzyżowanie),
@@ -525,7 +537,8 @@ Data MatrixGraph::genetic(uint populationSize)
 	//   a najsłabsze usuwane. Jeżeli nie znaleziono dostatecznie dobrego rozwiązania, 
 	//   algorytm powraca do kroku drugiego. W przeciwnym wypadku wybieramy 
 	//   najlepszego osobnika z populacji - jego genotyp to uzyskany wynik.
-
+	double duration = (clock() - overallTime) / (double)CLOCKS_PER_SEC;
+	return Data(bestPath, bestCost, results.str(), duration);
 }
 
 int MatrixGraph::getValue(uint row, uint col)

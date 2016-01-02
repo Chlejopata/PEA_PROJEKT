@@ -8,6 +8,7 @@ char menuString[] =
 { "\nMenu:\n[1] Zaladuj graf z pliku"
 "\n[2] Algorytm symulowanego wyzarzania"
 "\n[3] Algorytm tabu search"
+"\n[4] Algorytm genetyczny"
 "\n[0] Zakoncz\n" };
 
 using namespace std;
@@ -66,6 +67,9 @@ int main(int argc, char** argv)
 				break;
 				case '3':
 					printResults(isLoaded, graph.tabuSearch(), graph);
+					break;
+				case '4':
+					printResults(isLoaded, graph.genetic(), graph);
 					break;
 				case '0':
 				default:
