@@ -28,7 +28,7 @@ public:
 	uint greedyAlg(vector<uint> &bestRoute);
 	Data simulatedAnnealing(uint temperature = 0);
 	Data tabuSearch(uint tabuListSize = 5, uint iterations = 0);
-	Data genetic(uint populationSize = 5);
+	Data genetic(uint populationSize = 5, double mutationChance = 0.02);
 
 	int getValue(uint row, uint col);
 
@@ -36,6 +36,8 @@ public:
 
 	uint getVertexNumber();
 	uint minimizeCost();
+
+	uint calculateCost(vector<uint> &path);
 
 	void printRoute(vector<uint> route, bool noColor = false);
 protected:
@@ -65,7 +67,6 @@ private:
 	vector<Specimen> randomizePopulation(uint numberOfSpecimen);
 
 	long noRepeatDraw(bool* drawn, uint length);
-	uint calculateCost(vector<uint> &path);
 
 	static bool nextPermutation(uint *array, uint length);
 	static double acceptanceProbability(uint energy, uint newEnergy, uint temperature);

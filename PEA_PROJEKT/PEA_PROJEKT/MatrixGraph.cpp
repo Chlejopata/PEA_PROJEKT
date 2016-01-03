@@ -507,30 +507,29 @@ Data MatrixGraph::tabuSearch(uint tabuListSize, uint iterations)
 	return Data(bestPath, bestCost, results.str(), duration);
 }
 
-Data MatrixGraph::genetic(uint populationSize)
+Data MatrixGraph::genetic(uint populationSize, double mutationChance)
 {
 	clock_t overallTime = clock();
 	stringstream results;
 	vector<uint> bestPath(1);
 	uint bestCost = 0;
+
+	Specimen::setGraph(this);
+	Specimen::setMutationChance(mutationChance);
+
 	//1. Losowana jest pewna populacja początkowa.
-	auto startingPopulation = randomizePopulation(populationSize);
+	auto population = randomizePopulation(populationSize);
 
 	//2. Populacja poddawana jest ocenie(selekcja).
 	//   Najlepiej przystosowane osobniki biorą udział w procesie reprodukcji.
-	
-	Specimen p1(vertexNumber), p2(vertexNumber);
-	Specimen::Children2 children;
-
-	Specimen::crossover(p1, p2, children);
-
-	cout << "Rodzice:\n1: " << p1 << "\n2: " << p2;
-	cout << "\nDzieci:\n1: " << children[0] << "\n2: " << children[1] << endl;
-	
+	Specimen::makeSelection(population);
 
 	//3. Genotypy wybranych osobników poddawane są operatorom ewolucyjnym :
 	//	a. są ze sobą kojarzone poprzez złączanie genotypów rodziców(krzyżowanie),
+	Specimen::makeCrossover(population);
+	
 	//	b. przeprowadzana jest mutacja, czyli wprowadzenie drobnych losowych zmian.
+	Specimen::makeMutation(population);
 
 	//4. Rodzi się drugie(kolejne) pokolenie. Aby utrzymać stałą liczbę osobników 
 	//   w populacji te najlepsze(według funkcji oceniającej fenotyp) są powielane, 
@@ -600,6 +599,21 @@ uint MatrixGraph::minimizeCost()
 	output();
 	cout <<"lowerBound:"<<lowerBound<<"\n----------------------------------------" <<endl;*/
 	return lowerBound;
+}
+
+uint MatrixGraph::calculateCost(vector<uint> &path)
+{
+	uint cost = 0;
+	for (uint i = 1; i < path.size(); i++)
+	{
+		cost += getValue(path[i - 1], path[i]);
+	}
+
+	if (path.size() > 1)
+	{
+		cost += getValue(path.back(), path.front());
+	}
+	return cost;
 }
 
 void MatrixGraph::printRoute(vector<uint> route, bool noColor)
@@ -879,21 +893,6 @@ long MatrixGraph::noRepeatDraw(bool* drawn, uint length)
 
 	drawn[--retVal] = true;
 	return retVal;
-}
-
-uint MatrixGraph::calculateCost(vector<uint> &path)
-{
-	uint cost = 0;
-	for (uint i = 1; i < path.size(); i++)
-	{
-		cost += getValue(path[i - 1], path[i]);
-	}
-
-	if (path.size() > 1)
-	{
-		cost += getValue(path.back(), path.front());
-	}
-	return cost;
 }
 
 bool MatrixGraph::nextPermutation(uint *array, uint length)
