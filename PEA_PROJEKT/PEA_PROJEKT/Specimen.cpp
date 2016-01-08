@@ -229,8 +229,7 @@ void Specimen::inversion()
 	uint k1, k2;
 	getRandomIndexes(k1, k2);
 
-	for (; k1 != k2 && k1 < k2; ++k1, --k2)
-		swap(trait[k1], trait[k2]);
+	reverse(trait.begin() + k1, trait.begin() + k2);
 }
 
 void Specimen::insertion()
