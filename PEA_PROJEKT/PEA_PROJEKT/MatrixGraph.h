@@ -28,7 +28,7 @@ public:
 	uint greedyAlg(vector<uint> &bestRoute);
 	Data simulatedAnnealing(uint temperature = 0);
 	Data tabuSearch(uint tabuListSize = 5, uint iterations = 0);
-	Data genetic(uint populationSize = 5, double mutationChance = 0.02);
+	Data genetic(uint iterations = 500000, uint sameResultLimit = 500, uint populationSize = 10, double mutationChance = 0.05);
 
 	int getValue(uint row, uint col);
 

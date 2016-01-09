@@ -33,6 +33,10 @@ public:
 	// Operator przenosz¹cy z wektora
 	Specimen& operator=(vector<uint> &&path);
 
+	bool operator< (Specimen &s);
+	bool operator== (Specimen &s);
+	bool operator> (Specimen &s);
+
 	// Operator krzy¿owania
 	static void crossover(const Specimen &p1, const Specimen &p2, Children2 &children);
 	// Operator mutacji
@@ -51,6 +55,8 @@ public:
 
 	static void setMutationChance(double _mutationChance);
 	static void setGraph(MatrixGraph* _mg);
+
+	
 
 	friend ostream & operator<< (ostream &os, const Specimen &s);
 private:

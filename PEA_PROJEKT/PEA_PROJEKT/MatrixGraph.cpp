@@ -141,7 +141,7 @@ void MatrixGraph::generateGraph(uint vertexNumber, bool symmetrical)
 			{
 				if (row != col)
 				{
-					matrix[row][col] = rand() % (vertexNumber << 1);
+					matrix[row][col] = rand() % (vertexNumber << 1) + 1;
 					if (symmetrical)
 						matrix[col][row] = matrix[row][col];
 				}
@@ -507,36 +507,58 @@ Data MatrixGraph::tabuSearch(uint tabuListSize, uint iterations)
 	return Data(bestPath, bestCost, results.str(), duration);
 }
 
-Data MatrixGraph::genetic(uint populationSize, double mutationChance)
+Data MatrixGraph::genetic(uint iterations, uint sameResultLimit, uint populationSize, double mutationChance)
 {
 	clock_t overallTime = clock();
 	stringstream results;
-	vector<uint> bestPath(1);
-	uint bestCost = 0;
+	vector<uint> bestPath;
+	bestPath.reserve(vertexNumber);
+	uint bestCost = numeric_limits<uint>::max();
 
 	Specimen::setGraph(this);
 	Specimen::setMutationChance(mutationChance);
 
+	// Ilość razy z tym samym najlepszym wynikiem
+	uint sameResult = 0;
+
 	//1. Losowana jest pewna populacja początkowa.
-	auto population = randomizePopulation(populationSize);
+	auto population = randomizePopulation(populationSize << 1);
 
-	//2. Populacja poddawana jest ocenie(selekcja).
-	//   Najlepiej przystosowane osobniki biorą udział w procesie reprodukcji.
-	Specimen::makeSelection(population);
+	for (; iterations; --iterations)
+	{
+		//2. Populacja poddawana jest ocenie(selekcja).
+		//   Najlepiej przystosowane osobniki biorą udział w procesie reprodukcji.
+		Specimen::makeSelection(population);
 
-	//3. Genotypy wybranych osobników poddawane są operatorom ewolucyjnym :
-	//	a. są ze sobą kojarzone poprzez złączanie genotypów rodziców(krzyżowanie),
-	Specimen::makeCrossover(population);
-	
-	//	b. przeprowadzana jest mutacja, czyli wprowadzenie drobnych losowych zmian.
-	Specimen::makeMutation(population);
+		if (population[0].getCost() < bestCost)
+		{
+			bestPath = population[0].getTrait();
+			bestCost = population[0].getCost();
+			sameResult = 0;
+		}
+		else
+			++sameResult;
 
-	//4. Rodzi się drugie(kolejne) pokolenie. Aby utrzymać stałą liczbę osobników 
-	//   w populacji te najlepsze(według funkcji oceniającej fenotyp) są powielane, 
-	//   a najsłabsze usuwane. Jeżeli nie znaleziono dostatecznie dobrego rozwiązania, 
-	//   algorytm powraca do kroku drugiego. W przeciwnym wypadku wybieramy 
-	//   najlepszego osobnika z populacji - jego genotyp to uzyskany wynik.
+		if (sameResult > sameResultLimit)
+			break;
+
+		//3. Genotypy wybranych osobników poddawane są operatorom ewolucyjnym :
+		//	a. są ze sobą kojarzone poprzez złączanie genotypów rodziców(krzyżowanie),
+		Specimen::makeCrossover(population);
+
+		//	b. przeprowadzana jest mutacja, czyli wprowadzenie drobnych losowych zmian.
+		Specimen::makeMutation(population);
+
+		//4. Rodzi się drugie(kolejne) pokolenie. Aby utrzymać stałą liczbę osobników 
+		//   w populacji te najlepsze(według funkcji oceniającej fenotyp) są powielane, 
+		//   a najsłabsze usuwane. Jeżeli nie znaleziono dostatecznie dobrego rozwiązania, 
+		//   algorytm powraca do kroku drugiego. W przeciwnym wypadku wybieramy 
+		//   najlepszego osobnika z populacji - jego genotyp to uzyskany wynik.
+
+	}
+
 	double duration = (clock() - overallTime) / (double)CLOCKS_PER_SEC;
+	results << "Koszt drogi: " << bestCost << "\nCalkowity czas trwania: " << duration << " sekund\n";
 	return Data(bestPath, bestCost, results.str(), duration);
 }
 

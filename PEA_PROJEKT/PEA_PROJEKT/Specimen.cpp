@@ -63,6 +63,21 @@ Specimen& Specimen::operator=(vector<uint> &&path)
 	return *this;
 }
 
+bool Specimen::operator< (Specimen &s)
+{
+	return getCost() < s.getCost();
+}
+
+bool Specimen::operator== (Specimen &s)
+{
+	return getCost() == s.getCost();
+}
+
+bool Specimen::operator> (Specimen &s)
+{
+	return getCost() > s.getCost();
+}
+
 void Specimen::crossover(const Specimen &p1, const Specimen &p2, Children2 &children)
 {
 	OX(p1, p2, children);
@@ -113,7 +128,8 @@ void Specimen::setCost(uint _cost)
 
 void Specimen::makeSelection(vector<Specimen> &population)
 {
-
+	sort(population.begin(), population.end(), [](Specimen& s1, Specimen& s2)->bool{return s1 < s2; });
+	population.erase(population.begin() + (population.size() >> 1), population.end());
 }
 
 void Specimen::makeMutation(vector<Specimen> &population, MutationType mt)
@@ -127,7 +143,16 @@ void Specimen::makeMutation(vector<Specimen> &population, MutationType mt)
 
 void Specimen::makeCrossover(vector<Specimen> &population)
 {
-
+	uint k1, k2;
+	Children2 children;
+	uint length = population.size();
+	for (uint i = 0; i < (length >> 1); ++i)
+	{
+		getRandomIndexes(k1, k2, length);
+		crossover(population[k1], population[k2], children);
+		population.push_back(move(children[0]));
+		population.push_back(move(children[1]));
+	}
 }
 
 void Specimen::setMutationChance(double _mutationChance)
@@ -145,7 +170,7 @@ void Specimen::setGraph(MatrixGraph* _mg)
 	mg = _mg;
 }
 
-ostream & operator<< (ostream &os, const Specimen &s) 
+ostream & operator<< (ostream &os, const Specimen &s)
 {
 	for (auto v : s.getTrait())
 		os << v << " ";
@@ -191,9 +216,9 @@ void Specimen::OX(const Specimen &p1, const Specimen &p2, Children2 &children)
 	for (; i < k2; ++i)
 	{
 		if (ch1[i] != uintMax)
-			ch1Contains[i] = true;
+			ch1Contains[ch1[i]] = true;
 		if (ch2[i] != uintMax)
-			ch2Contains[i] = true;
+			ch2Contains[ch2[i]] = true;
 	}
 
 	uint ch1Pos = k2, ch2Pos = k2;
