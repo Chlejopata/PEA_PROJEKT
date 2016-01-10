@@ -33,9 +33,9 @@ public:
 	// Operator przenosz¹cy z wektora
 	Specimen& operator=(vector<uint> &&path);
 
-	bool operator< (Specimen &s);
-	bool operator== (Specimen &s);
-	bool operator> (Specimen &s);
+	bool operator< (const Specimen &s) const;
+	bool operator== (const Specimen &s) const;
+	bool operator> (const Specimen &s) const;
 
 	// Operator krzy¿owania
 	static void crossover(const Specimen &p1, const Specimen &p2, Children2 &children);

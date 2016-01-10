@@ -63,19 +63,19 @@ Specimen& Specimen::operator=(vector<uint> &&path)
 	return *this;
 }
 
-bool Specimen::operator< (Specimen &s)
+bool Specimen::operator< (const Specimen &s) const
 {
-	return getCost() < s.getCost();
+	return cost < s.cost;
 }
 
-bool Specimen::operator== (Specimen &s)
+bool Specimen::operator== (const Specimen &s) const
 {
-	return getCost() == s.getCost();
+	return cost == s.cost;
 }
 
-bool Specimen::operator> (Specimen &s)
+bool Specimen::operator>(const Specimen &s) const
 {
-	return getCost() > s.getCost();
+	return cost > s.cost;
 }
 
 void Specimen::crossover(const Specimen &p1, const Specimen &p2, Children2 &children)
@@ -128,7 +128,12 @@ void Specimen::setCost(uint _cost)
 
 void Specimen::makeSelection(vector<Specimen> &population)
 {
-	sort(population.begin(), population.end(), [](Specimen& s1, Specimen& s2)->bool{return s1 < s2; });
+	for (auto& s : population)
+	{
+		s.getCost();
+	}
+
+	sort(population.begin(), population.end(), less<Specimen>());
 	population.erase(population.begin() + (population.size() >> 1), population.end());
 }
 
